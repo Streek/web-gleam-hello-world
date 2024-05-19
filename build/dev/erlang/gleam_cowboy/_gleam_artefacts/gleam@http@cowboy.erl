@@ -43,7 +43,7 @@ get_query(Request) ->
             {some, Query}
     end.
 
--spec proplist_get_all(list({CUM, CUN}), CUM) -> list(CUN).
+-spec proplist_get_all(list({IDC, IDD}), IDC) -> list(IDD).
 proplist_get_all(Input, Key) ->
     gleam@list:filter_map(Input, fun(Item) -> case Item of
                 {K, V} when K =:= Key ->

@@ -4,10 +4,10 @@
 -export([to_uri/1, from_uri/1, get_header/2, set_header/3, prepend_header/3, set_body/2, map/2, path_segments/1, get_query/1, set_query/2, set_method/2, new/0, to/1, set_scheme/2, set_host/2, set_port/2, set_path/2, set_cookie/3, get_cookies/1]).
 -export_type([request/1]).
 
--type request(BEE) :: {request,
+-type request(GMU) :: {request,
         gleam@http:method(),
         list({binary(), binary()}),
-        BEE,
+        GMU,
         gleam@http:scheme(),
         binary(),
         gleam@option:option(integer()),
@@ -59,7 +59,7 @@ from_uri(Uri) ->
 get_header(Request, Key) ->
     gleam@list:key_find(erlang:element(3, Request), gleam@string:lowercase(Key)).
 
--spec set_header(request(BEO), binary(), binary()) -> request(BEO).
+-spec set_header(request(GNE), binary(), binary()) -> request(GNE).
 set_header(Request, Key, Value) ->
     Headers = gleam@list:key_set(
         erlang:element(3, Request),
@@ -68,18 +68,18 @@ set_header(Request, Key, Value) ->
     ),
     erlang:setelement(3, Request, Headers).
 
--spec prepend_header(request(BER), binary(), binary()) -> request(BER).
+-spec prepend_header(request(GNH), binary(), binary()) -> request(GNH).
 prepend_header(Request, Key, Value) ->
     Headers = [{gleam@string:lowercase(Key), Value} |
         erlang:element(3, Request)],
     erlang:setelement(3, Request, Headers).
 
--spec set_body(request(any()), BEW) -> request(BEW).
+-spec set_body(request(any()), GNM) -> request(GNM).
 set_body(Req, Body) ->
     {request, Method, Headers, _, Scheme, Host, Port, Path, Query} = Req,
     {request, Method, Headers, Body, Scheme, Host, Port, Path, Query}.
 
--spec map(request(BEY), fun((BEY) -> BFA)) -> request(BFA).
+-spec map(request(GNO), fun((GNO) -> GNQ)) -> request(GNQ).
 map(Request, Transform) ->
     _pipe = erlang:element(4, Request),
     _pipe@1 = Transform(_pipe),
@@ -101,7 +101,7 @@ get_query(Request) ->
             {ok, []}
     end.
 
--spec set_query(request(BFK), list({binary(), binary()})) -> request(BFK).
+-spec set_query(request(GOA), list({binary(), binary()})) -> request(GOA).
 set_query(Req, Query) ->
     Pair = fun(T) ->
         gleam@string_builder:from_strings(
@@ -123,7 +123,7 @@ set_query(Req, Query) ->
     end,
     erlang:setelement(9, Req, Query@1).
 
--spec set_method(request(BFO), gleam@http:method()) -> request(BFO).
+-spec set_method(request(GOE), gleam@http:method()) -> request(GOE).
 set_method(Req, Method) ->
     erlang:setelement(2, Req, Method).
 
@@ -145,23 +145,23 @@ to(Url) ->
     _pipe@1 = gleam@uri:parse(_pipe),
     gleam@result:then(_pipe@1, fun from_uri/1).
 
--spec set_scheme(request(BFV), gleam@http:scheme()) -> request(BFV).
+-spec set_scheme(request(GOL), gleam@http:scheme()) -> request(GOL).
 set_scheme(Req, Scheme) ->
     erlang:setelement(5, Req, Scheme).
 
--spec set_host(request(BFY), binary()) -> request(BFY).
+-spec set_host(request(GOO), binary()) -> request(GOO).
 set_host(Req, Host) ->
     erlang:setelement(6, Req, Host).
 
--spec set_port(request(BGB), integer()) -> request(BGB).
+-spec set_port(request(GOR), integer()) -> request(GOR).
 set_port(Req, Port) ->
     erlang:setelement(7, Req, {some, Port}).
 
--spec set_path(request(BGE), binary()) -> request(BGE).
+-spec set_path(request(GOU), binary()) -> request(GOU).
 set_path(Req, Path) ->
     erlang:setelement(8, Req, Path).
 
--spec set_cookie(request(BGH), binary(), binary()) -> request(BGH).
+-spec set_cookie(request(GOX), binary(), binary()) -> request(GOX).
 set_cookie(Req, Name, Value) ->
     New_cookie_string = gleam@string:join([Name, Value], <<"="/utf8>>),
     {Cookies_string@2, Headers@1} = case gleam@list:key_pop(

@@ -4,46 +4,46 @@
 -export([continue/1, with_selector/2, to_erlang_start_result/1, start_spec/1, start/2, send/2, call/3]).
 -export_type([message/1, next/2, init_result/2, self/2, spec/2, start_error/0, start_init_message/1]).
 
--type message(BSF) :: {message, BSF} |
+-type message(HAV) :: {message, HAV} |
     {system, gleam@otp@system:system_message()} |
     {unexpected, gleam@dynamic:dynamic_()}.
 
--type next(BSG, BSH) :: {continue,
-        BSH,
-        gleam@option:option(gleam@erlang@process:selector(BSG))} |
+-type next(HAW, HAX) :: {continue,
+        HAX,
+        gleam@option:option(gleam@erlang@process:selector(HAW))} |
     {stop, gleam@erlang@process:exit_reason()}.
 
--type init_result(BSI, BSJ) :: {ready, BSI, gleam@erlang@process:selector(BSJ)} |
+-type init_result(HAY, HAZ) :: {ready, HAY, gleam@erlang@process:selector(HAZ)} |
     {failed, binary()}.
 
--type self(BSK, BSL) :: {self,
+-type self(HBA, HBB) :: {self,
         gleam@otp@system:mode(),
         gleam@erlang@process:pid_(),
-        BSK,
-        gleam@erlang@process:subject(BSL),
-        gleam@erlang@process:selector(message(BSL)),
+        HBA,
+        gleam@erlang@process:subject(HBB),
+        gleam@erlang@process:selector(message(HBB)),
         gleam@otp@system:debug_state(),
-        fun((BSL, BSK) -> next(BSL, BSK))}.
+        fun((HBB, HBA) -> next(HBB, HBA))}.
 
--type spec(BSM, BSN) :: {spec,
-        fun(() -> init_result(BSM, BSN)),
+-type spec(HBC, HBD) :: {spec,
+        fun(() -> init_result(HBC, HBD)),
         integer(),
-        fun((BSN, BSM) -> next(BSN, BSM))}.
+        fun((HBD, HBC) -> next(HBD, HBC))}.
 
 -type start_error() :: init_timeout |
     {init_failed, gleam@erlang@process:exit_reason()} |
     {init_crashed, gleam@dynamic:dynamic_()}.
 
--type start_init_message(BSO) :: {ack,
-        {ok, gleam@erlang@process:subject(BSO)} |
+-type start_init_message(HBE) :: {ack,
+        {ok, gleam@erlang@process:subject(HBE)} |
             {error, gleam@erlang@process:exit_reason()}} |
     {mon, gleam@erlang@process:process_down()}.
 
--spec continue(BSV) -> next(any(), BSV).
+-spec continue(HBL) -> next(any(), HBL).
 continue(State) ->
     {continue, State, none}.
 
--spec with_selector(next(BSZ, BTA), gleam@erlang@process:selector(BSZ)) -> next(BSZ, BTA).
+-spec with_selector(next(HBP, HBQ), gleam@erlang@process:selector(HBP)) -> next(HBP, HBQ).
 with_selector(Value, Selector) ->
     case Value of
         {continue, State, _} ->
@@ -57,7 +57,7 @@ with_selector(Value, Selector) ->
 exit_process(Reason) ->
     Reason.
 
--spec selecting_system_messages(gleam@erlang@process:selector(message(BTL))) -> gleam@erlang@process:selector(message(BTL)).
+-spec selecting_system_messages(gleam@erlang@process:selector(message(HCB))) -> gleam@erlang@process:selector(message(HCB)).
 selecting_system_messages(Selector) ->
     _pipe = Selector,
     gleam@erlang@process:selecting_record3(
@@ -66,7 +66,7 @@ selecting_system_messages(Selector) ->
         fun gleam_otp_external:convert_system_message/2
     ).
 
--spec receive_message(self(any(), BTH)) -> message(BTH).
+-spec receive_message(self(any(), HBX)) -> message(HBX).
 receive_message(Self) ->
     Selector = case erlang:element(2, Self) of
         suspended ->
@@ -97,9 +97,9 @@ process_status_info(Self) ->
         gleam@dynamic:from(erlang:element(4, Self))}.
 
 -spec init_selector(
-    gleam@erlang@process:subject(BXZ),
-    gleam@erlang@process:selector(BXZ)
-) -> gleam@erlang@process:selector(message(BXZ)).
+    gleam@erlang@process:subject(HGP),
+    gleam@erlang@process:selector(HGP)
+) -> gleam@erlang@process:selector(message(HGP)).
 init_selector(Subject, Selector) ->
     _pipe = gleam_erlang_ffi:new_selector(),
     _pipe@1 = gleam@erlang@process:selecting(
@@ -173,8 +173,8 @@ loop(Self) ->
     end.
 
 -spec initialise_actor(
-    spec(any(), BUC),
-    gleam@erlang@process:subject({ok, gleam@erlang@process:subject(BUC)} |
+    spec(any(), HCS),
+    gleam@erlang@process:subject({ok, gleam@erlang@process:subject(HCS)} |
         {error, gleam@erlang@process:exit_reason()})
 ) -> gleam@erlang@process:exit_reason().
 initialise_actor(Spec, Ack) ->
@@ -211,7 +211,7 @@ to_erlang_start_result(Res) ->
             {error, gleam@dynamic:from(X@1)}
     end.
 
--spec start_spec(spec(any(), BUP)) -> {ok, gleam@erlang@process:subject(BUP)} |
+-spec start_spec(spec(any(), HDF)) -> {ok, gleam@erlang@process:subject(HDF)} |
     {error, start_error()}.
 start_spec(Spec) ->
     Ack_subject = gleam@erlang@process:new_subject(),
@@ -250,8 +250,8 @@ start_spec(Spec) ->
     gleam_erlang_ffi:demonitor(Monitor),
     Result.
 
--spec start(BUV, fun((BUW, BUV) -> next(BUW, BUV))) -> {ok,
-        gleam@erlang@process:subject(BUW)} |
+-spec start(HDL, fun((HDM, HDL) -> next(HDM, HDL))) -> {ok,
+        gleam@erlang@process:subject(HDM)} |
     {error, start_error()}.
 start(State, Loop) ->
     start_spec(
@@ -261,14 +261,14 @@ start(State, Loop) ->
             Loop}
     ).
 
--spec send(gleam@erlang@process:subject(BVC), BVC) -> nil.
+-spec send(gleam@erlang@process:subject(HDS), HDS) -> nil.
 send(Subject, Msg) ->
     gleam@erlang@process:send(Subject, Msg).
 
 -spec call(
-    gleam@erlang@process:subject(BVE),
-    fun((gleam@erlang@process:subject(BVG)) -> BVE),
+    gleam@erlang@process:subject(HDU),
+    fun((gleam@erlang@process:subject(HDW)) -> HDU),
     integer()
-) -> BVG.
+) -> HDW.
 call(Selector, Make_message, Timeout) ->
     gleam@erlang@process:call(Selector, Make_message, Timeout).
