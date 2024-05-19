@@ -1,0 +1,13 @@
+{application, gleam_cowboy, [
+    {vsn, "0.7.0"},
+    {applications, [cowboy,
+                    gleam_erlang,
+                    gleam_hackney,
+                    gleam_http,
+                    gleam_otp,
+                    gleam_stdlib,
+                    gleeunit]},
+    {description, "Run Gleam HTTP services with the Cowboy web server"},
+    {modules, [gleam@http@cowboy]},
+    {registered, []}
+]}.
